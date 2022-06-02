@@ -51,12 +51,15 @@ impl SumikkoBrain {
     }
 
     fn remember_memory(&mut self, pointer: &mut usize) -> AResult<()> {
+        if self.tail.is_empty() {
+            return Err(anyhow!("すみっコ達のことが思い出せないよ〜!!"))
+        }
         if self.list[self.pointer] != 0 {
             match self.tail.back() {
                 Some(smbr_pointer) => {
                     *pointer = *smbr_pointer;
                 },
-                None => return Err(anyhow!("すみっコ達のことが思い出せないよ〜!!")),
+                None => (),
             }
         } else {
             self.tail.pop_back();
