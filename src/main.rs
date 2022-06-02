@@ -10,9 +10,24 @@ struct SumikkoBrain {
 }
 
 impl SumikkoBrain {
+    fn move_east(&mut self) {
+        if self.pointer == self.list.len() - 1 {
+            self.list.push_back(0);
+        }
+        self.pointer += 1;
+    }
+
+    fn move_west(&mut self) {
+        if self.pointer == 0 {
+            self.list.push_front(0);
+        } else {
+            self.pointer -= 1;
+        }
+    }
+
     fn inc_sumikko(&mut self) -> AResult<()> {
         if self.list[self.pointer] == 255 { 
-            return Err(anyhow!("これ以上値を増やせないよ〜!!")) 
+            return Err(anyhow!("これ以上すみっコを増やせないよ〜!!")) 
         }
         self.list[self.pointer] += 1;
         return Ok(())
@@ -20,7 +35,7 @@ impl SumikkoBrain {
 
     fn dec_sumikko(&mut self) -> AResult<()> {
         if self.list[self.pointer] == 0 { 
-            return Err(anyhow!("これ以上値を減らせないよ〜!!")) 
+            return Err(anyhow!("これ以上すみっコを減らせないよ〜!!")) 
         }
         self.list[self.pointer] -= 1;
         return Ok(())
@@ -70,11 +85,11 @@ fn main() -> AResult<()> {
         }
 
         match contents.get(pointer - 4..pointer) {
-            Some(slice) if slice == sirokuma => {
-                println!("しろくま");
+            Some(slice) if slice == sirokuma => { // しろくま: 東の街に移動する
+                sumikko_brain.move_east();
             },
-            Some(slice) if slice == tonkatu => {
-                println!("とんかつ");
+            Some(slice) if slice == tonkatu => { // とんかつ: 西の街に移動する
+                sumikko_brain.move_west();
             },
             Some(slice) if slice == tapioka => {
                 println!("たぴおか");
