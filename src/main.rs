@@ -1,17 +1,42 @@
-use std::env;
-use std::fs;
+use std::{fs, env};
+use std::collections::VecDeque;
 
-use anyhow::{Context, Result as AResult};
+use anyhow::{anyhow, Context, Result as AResult};
+
+#[derive(Debug)]
+struct SumikkoBrain {
+    pointer: usize,
+    list: VecDeque<u8>,
+}
+
+impl SumikkoBrain {
+    fn inc_sumikko(&mut self) -> AResult<()> {
+        if self.list[self.pointer] == 255 { 
+            return Err(anyhow!("これ以上値を増やせないよ〜!!")) 
+        }
+        self.list[self.pointer] += 1;
+        return Ok(())
+    }
+
+    fn dec_sumikko(&mut self) -> AResult<()> {
+        if self.list[self.pointer] == 0 { 
+            return Err(anyhow!("これ以上値を減らせないよ〜!!")) 
+        }
+        self.list[self.pointer] -= 1;
+        return Ok(())
+    }
+}
 
 fn main() -> AResult<()> {
     let filepath = env::args().nth(1)
-        .with_context(|| "引数がおかしいんだよ〜!!")?;
+        .with_context(|| "引数がおかしいよ〜!!")?;
     let contents = fs::read_to_string(filepath)
         .with_context(|| "ファイルが見当たらないよ〜!!")?
         .chars()
         .collect::<Vec<char>>();
 
     let mut pointer = 0;
+    let mut sumikko_brain = SumikkoBrain { pointer: 0, list: VecDeque::from(vec![0]) };
     
     let sirokuma = String::from("しろくま").chars().collect::<Vec<char>>();
     let tonkatu = String::from("とんかつ").chars().collect::<Vec<char>>();
@@ -37,9 +62,9 @@ fn main() -> AResult<()> {
             _ => pointer -= 4,
         }
 
-        match contents.get(pointer - 5..pointer) {
+        match contents.get(pointer - 5..pointer) { // ぺんぎん?: すみっコを１匹増やす
             Some(slice) if slice == penguin => {
-                println!("ぺんぎん?");
+                sumikko_brain.inc_sumikko()?;
             },
             _ => pointer -= 1,
         }
@@ -63,9 +88,9 @@ fn main() -> AResult<()> {
             _ => pointer -= 1,
         }
 
-        match contents.get(pointer - 3..pointer) {
+        match contents.get(pointer - 3..pointer) { // とかげ: すみっコを１匹減らす
             Some(slice) if slice == tokage => {
-                println!("とかげ");
+                sumikko_brain.dec_sumikko()?;
             },
             _ => pointer -= 1,
         }
@@ -77,6 +102,6 @@ fn main() -> AResult<()> {
             _ => pointer -= 1,
         }
     }
-
+    println!("{:?}", sumikko_brain);
     return Ok(())
 }
