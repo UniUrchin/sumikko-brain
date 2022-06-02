@@ -7,6 +7,7 @@ use anyhow::{anyhow, Context, Result as AResult};
 struct SumikkoBrain {
     pointer: usize,
     list: VecDeque<u8>,
+    tail: VecDeque<usize>,
 }
 
 impl SumikkoBrain {
@@ -40,6 +41,28 @@ impl SumikkoBrain {
         self.list[self.pointer] -= 1;
         return Ok(())
     }
+
+    fn print_ascii(&mut self) {
+        print!("{}", self.list[self.pointer] as char);
+    }
+
+    fn create_memory(&mut self, pointer: &mut usize) {
+        self.tail.push_back(*pointer);
+    }
+
+    fn remember_memory(&mut self, pointer: &mut usize) -> AResult<()> {
+        if self.list[self.pointer] != 0 {
+            match self.tail.back() {
+                Some(smbr_pointer) => {
+                    *pointer = *smbr_pointer;
+                },
+                None => return Err(anyhow!("すみっコ達のことが思い出せないよ〜!!")),
+            }
+        } else {
+            self.tail.pop_back();
+        }
+        return Ok(())
+    }
 }
 
 fn main() -> AResult<()> {
@@ -51,7 +74,11 @@ fn main() -> AResult<()> {
         .collect::<Vec<char>>();
 
     let mut pointer = 0;
-    let mut sumikko_brain = SumikkoBrain { pointer: 0, list: VecDeque::from(vec![0]) };
+    let mut sumikko_brain = SumikkoBrain { 
+        pointer: 0, 
+        list: VecDeque::from(vec![0]),
+        tail: VecDeque::new(),
+    };
     
     let sirokuma = String::from("しろくま").chars().collect::<Vec<char>>();
     let tonkatu = String::from("とんかつ").chars().collect::<Vec<char>>();
@@ -68,11 +95,13 @@ fn main() -> AResult<()> {
         pointer += 9;
 
         match contents.get(pointer - 9..pointer) {
-            Some(slice) if slice == ebitail => {
-                println!("えびふらいのしっぽ");
+            Some(slice) if slice == ebitail => { // すみっコ達との思い出を作る
+                sumikko_brain.create_memory(&mut pointer);
+                continue
             },
-            Some(slice) if slice == ajitail => {
-                println!("あじふらいのしっぽ");
+            Some(slice) if slice == ajitail => { // すみっコ達との思い出に浸る
+                sumikko_brain.remember_memory(&mut pointer)?;
+                continue
             },
             _ => pointer -= 4,
         }
@@ -80,6 +109,7 @@ fn main() -> AResult<()> {
         match contents.get(pointer - 5..pointer) { // ぺんぎん?: すみっコを１匹増やす
             Some(slice) if slice == penguin => {
                 sumikko_brain.inc_sumikko()?;
+                continue
             },
             _ => pointer -= 1,
         }
@@ -87,18 +117,23 @@ fn main() -> AResult<()> {
         match contents.get(pointer - 4..pointer) {
             Some(slice) if slice == sirokuma => { // しろくま: 東の街に移動する
                 sumikko_brain.move_east();
+                continue
             },
             Some(slice) if slice == tonkatu => { // とんかつ: 西の街に移動する
                 sumikko_brain.move_west();
+                continue
             },
             Some(slice) if slice == tapioka => {
                 println!("たぴおか");
+                continue
             },
             Some(slice) if slice == zasso => {
                 println!("ざっそう");
+                continue
             },
             Some(slice) if slice == hurosiki => {
                 println!("ふろしき");
+                continue
             },
             _ => pointer -= 1,
         }
@@ -106,17 +141,19 @@ fn main() -> AResult<()> {
         match contents.get(pointer - 3..pointer) { // とかげ: すみっコを１匹減らす
             Some(slice) if slice == tokage => {
                 sumikko_brain.dec_sumikko()?;
+                continue
             },
             _ => pointer -= 1,
         }
 
-        match contents.get(pointer - 2..pointer) {
+        match contents.get(pointer - 2..pointer) { // ねこ: 説明は後で考える...
             Some(slice) if slice == neko => {
-                println!("ねこ");
+                sumikko_brain.print_ascii();
+                continue
             },
             _ => pointer -= 1,
         }
     }
-    println!("{:?}", sumikko_brain);
+    // println!("{}: {:?}", pointer, sumikko_brain);
     return Ok(())
 }
