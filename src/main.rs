@@ -65,7 +65,7 @@ impl SumikkoBrain {
         self.tail.push_back(*pointer);
     }
 
-    fn remember_memory(&mut self, pointer: &mut usize) -> AResult<()> { // 改良の余地あり
+    fn remember_memory(&mut self, pointer: &mut usize) -> AResult<()> {
         if self.tail.is_empty() {
             return Err(anyhow!("すみっコ達のことが思い出せないよ〜!!"))
         }
@@ -90,7 +90,7 @@ impl SumikkoBrain {
 
 fn main() -> AResult<()> {
     let filepath = env::args().nth(1)
-        .with_context(|| "引数がおかしいよ〜!!")?;
+        .with_context(|| "コマンドの引数がおかしいよ〜!!")?;
     let contents = fs::read_to_string(filepath)
         .with_context(|| "ファイルが見当たらないよ〜!!")?
         .chars()
