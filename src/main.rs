@@ -89,7 +89,8 @@ impl SumikkoBrain {
 }
 
 fn main() -> AResult<()> {
-    let filepath = env::args().nth(1)
+    let filepath = env::args()
+        .nth(1)
         .with_context(|| "コマンドの引数がおかしいよ〜!!")?;
     let contents = fs::read_to_string(filepath)
         .with_context(|| "ファイルが見当たらないよ〜!!")?
