@@ -3,6 +3,7 @@ name = "sumikko-brain"
 version = "0.1.0"
 authors = ["UniUrchin <85057870+UniUrchin@users.noreply.github.com>"]
 edition = "2018"
+default-run = "sumikko-brain"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -10,12 +11,8 @@ edition = "2018"
 crate-type = ["cdylib", "lib"]
 
 [[bin]]
-name = "test"
-path = "test/test.rs"
-
-[[bin]]
 name = "convert"
-path = "test/convert.rs"
+path = "utils/convert.rs"
 
 [dependencies]
 clap = { version = "4.2.5", features = ["derive"] }
